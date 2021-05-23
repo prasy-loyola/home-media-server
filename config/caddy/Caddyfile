@@ -1,0 +1,15 @@
+{$DOMAIN_NAME}:80 {
+  respond ":-P" 403
+}
+
+{$DOMAIN_NAME}:443 {
+  respond ":-P" 403
+}
+
+{$DOMAIN_NAME}:{$QBITTORRENT_EXTERNAL_PORT} {
+  reverse_proxy qbittorrent:{$QBITTORRENT_LOCAL_PORT}
+}
+
+{$DOMAIN_NAME}:{$JELLYFIN_EXTERNAL_PORT} {
+  reverse_proxy jellyfin:{$JELLYFIN_LOCAL_PORT}
+}
