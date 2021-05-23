@@ -27,8 +27,7 @@
         - ./.env
       environment: 
         - JELLYFIN_PublishedServerUrl=https://${DOMAIN_NAME}:${JELLYFIN_EXTERNAL_PORT}
-      user: ${PGID}:${PUID}
-
+    
       volumes:
         - ./config/jellyfin/config:/config
         - ./config/jellyfin/cache:/cache
