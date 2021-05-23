@@ -1,0 +1,3 @@
+[submodule "config/vuetorrent"]
+	path = config/vuetorrent
+	url = https://github.com/WDaan/VueTorrent.git
