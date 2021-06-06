@@ -1,64 +1,64 @@
 ---
-  version: "2.1"
-  
-  services:
-    qbittorrent:
-      image: ghcr.io/linuxserver/qbittorrent:${QBITTORRENT_TAG}
-      container_name: qbittorrent
-      env_file: 
-        - ./.env
-      environment: 
-        - WEBUI_PORT=$QBITTORRENT_LOCAL_PORT
-      volumes:
-        - ./config/qbittorrent:/config
-        - ./config/vuetorrent:/vuetorrent
-        - ${MOVIES_DIRECTORY}:/movies
-        - ${TVSHOWS_DIRECTORY}:/tvshows
-      ports:
-        - 6881:6881
-        - 6881:6881/udp
-        - ${QBITTORRENT_LOCAL_PORT}:${QBITTORRENT_LOCAL_PORT}
-      restart: unless-stopped
-  
-    jellyfin:
-      image: jellyfin/jellyfin
-      container_name: jellyfin
-      env_file: 
-        - ./.env
-      environment: 
-        - JELLYFIN_PublishedServerUrl=https://${DOMAIN_NAME}:${JELLYFIN_EXTERNAL_PORT}
-    
-      volumes:
-        - ./config/jellyfin/config:/config
-        - ./config/jellyfin/cache:/cache
-        - ${MOVIES_DIRECTORY}:/movies
-        - ${TVSHOWS_DIRECTORY}:/tvshows
+version: "2.1"
 
-      ports:
-        - ${JELLYFIN_LOCAL_PORT}:${JELLYFIN_LOCAL_PORT}
-        
-      restart: "unless-stopped"
-      # Optional - alternative address used for autodiscovery
+services:
+  qbittorrent:
+    image: ${QBITTORRENT_IMAGE}
+    container_name: qbittorrent
+    env_file:
+      - ./.env
+    environment:
+      - WEBUI_PORT=$QBITTORRENT_LOCAL_PORT
+    volumes:
+      - ./config/qbittorrent:/config
+      - ./config/vuetorrent:/vuetorrent
+      - ${MOVIES_DIRECTORY}:/movies
+      - ${TVSHOWS_DIRECTORY}:/tvshows
+    ports:
+      - 6881:6881
+      - 6881:6881/udp
+      - ${QBITTORRENT_LOCAL_PORT}:${QBITTORRENT_LOCAL_PORT}
+    restart: unless-stopped
 
-    caddy:
-      container_name: caddy
-      image: caddy
-      restart: unless-stopped
-      env_file: 
-        - ./.env
-      ports:
-        - "80:80"
-        - "443:443"
-        - "${QBITTORRENT_EXTERNAL_PORT}:${QBITTORRENT_EXTERNAL_PORT}"
-        - "${JELLYFIN_EXTERNAL_PORT}:${JELLYFIN_EXTERNAL_PORT}"
-      external_links:
-          - jellyfin:jellyfin
-          - qbittorrent:qbittorrent
-      volumes:
-        - ./config/caddy/Caddyfile:/etc/caddy/Caddyfile
-        - caddy_data:/data
-        - caddy_config:/config
+  jellyfin:
+    image: ${JELLYFIN_IMAGE}
+    container_name: jellyfin
+    env_file:
+      - ./.env
+    environment:
+      - JELLYFIN_PublishedServerUrl=https://${DOMAIN_NAME}:${JELLYFIN_EXTERNAL_PORT}
 
-  volumes:
-    caddy_data:
-    caddy_config:
+    volumes:
+      - ./config/jellyfin/config:/config
+      - ./config/jellyfin/cache:/cache
+      - ${MOVIES_DIRECTORY}:/movies
+      - ${TVSHOWS_DIRECTORY}:/tvshows
+
+    ports:
+      - ${JELLYFIN_LOCAL_PORT}:${JELLYFIN_LOCAL_PORT}
+
+    restart: "unless-stopped"
+    # Optional - alternative address used for autodiscovery
+
+  caddy:
+    container_name: caddy
+    image: ${CADDY_IMAGE}
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    ports:
+      - "80:80"
+      - "443:443"
+      - "${QBITTORRENT_EXTERNAL_PORT}:${QBITTORRENT_EXTERNAL_PORT}"
+      - "${JELLYFIN_EXTERNAL_PORT}:${JELLYFIN_EXTERNAL_PORT}"
+    external_links:
+      - jellyfin:jellyfin
+      - qbittorrent:qbittorrent
+    volumes:
+      - ./config/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:
